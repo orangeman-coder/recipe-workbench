@@ -3,3 +3,4 @@ _*.png
 _*.js
 *.log
 .DS_Store
+_deploy_tmp/
