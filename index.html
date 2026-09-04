@@ -629,10 +629,12 @@ function updateDemoBanner(){
 }
 
 /* ================= 代理（同源 /api 优先，本地 8787 兜底，解决浏览器 CORS 限制） ================= */
-let _proxyBase=undefined;
+let _proxyBase=undefined,_proxyFailAt=0;
 async function getProxyBase(){
-  if(_proxyBase!==undefined)return _proxyBase;
-  try{const r=await fetch('api/health',{cache:'no-store'});_proxyBase=r.ok?'':false}catch(e){_proxyBase=false}
+  if(_proxyBase!==undefined&&_proxyBase!==false)return _proxyBase;
+  if(_proxyBase===false&&Date.now()-_proxyFailAt<30000)return false;
+  _proxyBase=false;_proxyFailAt=Date.now();
+  try{const r=await fetch('api/health',{cache:'no-store'});_proxyBase=r.ok?'':false}catch(e){}
   if(_proxyBase===false){
     try{const r=await fetch('http://127.0.0.1:8787/api/health',{cache:'no-store'});if(r.ok)_proxyBase='http://127.0.0.1:8787'}catch(e){}
   }
